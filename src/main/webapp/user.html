@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USER PAGE</title>
+    <link rel="stylesheet" href="user.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css" integrity="sha384-jLKHWM3JRmfMU0A5x5AkjWkw/EYfGUAGagvnfryNV3F9VqM98XiIH7VBGVoxVSc7" crossorigin="anonymous">
+
+</head>
+<style>
+    .table{
+        margin-top: -40px;
+        margin-left: 225px;
+        /* margin-bottom: 10px; */
+        color: aliceblue;
+    }
+</style>
+<body>
+    <section class="header">
+        <nav>
+            <a href="index.html"><img src="images/logo.png"></a>
+            <div class="nav-links" id="navLinks">
+                <i class="fa fa-times" onclick="hideMenu()"></i>
+                <ul>
+                    <li><a href="index.html">HOME</a></li>
+                    <li><a href="attendance.html">ATTENDANCE</a></li>
+                    <li><a href="admin.html">ADMIN</a></li>
+                </ul>
+            </div>
+            <i class="fa fa-bars" onclick="showMenu()"></i>
+        </nav>
+        <div>
+        <div class="login">
+            <h1>User details</h1>
+            <form action="">
+                <p>Username</p>
+                <input type="text" name="" placeholder="Enter Username">
+                <p>Password</p>
+                <input type="password" name="" placeholder="Enter Password">
+                <input type="submit" name="" value="Login">
+                <a href="#">Lost your password?</a>
+                <a href="#">Don't have an account?</a>
+            </form>
+        </div>
+            <div class="table">
+                <table class="table1">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Father Name</th>
+                        <th scope="col">Mother Name</th>
+                        <th scope="col">Adm. No.</th>
+                        <th scope="col">Adm. Date</th>
+                        <th scope="col">Roll. No.</th>
+                        <th scope="col">Class</th>
+                        <th scope="col">Section</th>
+                        <th scope="col">Student status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">1</th>
+                        <td>Yash</td>
+                        <td>26</td>
+                        <td>ECE</td>
+                        <td>A</td>
+                        <td>50</td>
+                        <td>45</td>
+                        <td>5</td>
+                        <td>24 May</td>
+                        <td>Present</td>                   
+                      </tr>
+                      <tr>
+                        <th scope="row">2</th>
+                        <td>Pankaj</td>
+                        <td>29</td>
+                        <td>ECE</td>
+                        <td>A</td>
+                        <td>50</td>
+                        <td>42</td>
+                        <td>8</td>
+                        <td>24 May</td>
+                        <td>Present</td>   
+                      </tr>
+                      <tr>
+                        <th scope="row">3</th>
+                        <td>Utkarsh</td>
+                        <td>24</td>
+                        <td>ECE</td>
+                        <td>A</td>
+                        <td>50</td>
+                        <td>40</td>
+                        <td>10</td>
+                        <td>24 May</td>
+                        <td>Present</td>   
+                      </tr>
+                    </tbody>
+                  </table>
+
+            </div>
+        </div>    
+    </section>    
+
+</body>
+</html>
