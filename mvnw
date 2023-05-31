@@ -49,7 +49,7 @@ if [ -z "$MAVEN_SKIP_RC" ] ; then
   fi
 
 fi
-
+-Djavacpp.platform=your-target-platform
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;
 darwin=false;
@@ -306,7 +306,7 @@ MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
 export MAVEN_CMD_LINE_ARGS
 
 WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
-
+ 
 exec "$JAVACMD" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \

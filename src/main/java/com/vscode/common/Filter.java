@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Utkarsh Bhardwaj 
+ * @author Utkarsh Bhardwaj
  */
 
 public class Filter implements Serializable {
@@ -16,7 +16,9 @@ public class Filter implements Serializable {
 	private static final long serialVersionUID = -2504359937793068240L;
 
 	private String orderBy = null;
-	private SortType sort = SortType.UNSORTED;
+	private SortType sort = SortType.ASC;
+	private Aggregate aggFunc = null;
+	private String aggColumn = null;
 	private String queryString = null;
 	private String additionString = null;
 	private boolean isOrderByCharToNumber = false;
@@ -24,8 +26,7 @@ public class Filter implements Serializable {
 	private List<Criteria> criteriaSet = null;
 	private List<String> selectColumns = null;
 	private List<String> groupByColumns = null;
-    private String tableName = null;
-	
+
 	public Filter() {
 		criteriaSet = new ArrayList<Criteria>();
 	}
@@ -53,6 +54,19 @@ public class Filter implements Serializable {
 
 	public void setSort(SortType sort) {
 		this.sort = sort;
+	}
+
+	public Aggregate getAggFunc() {
+		return aggFunc;
+	}
+
+	public String getAggColumn() {
+		return aggColumn;
+	}
+
+	public void setAggregate(Aggregate aggFunc, String col) {
+		this.aggFunc = aggFunc;
+		this.aggColumn = col;
 	}
 
 	public String getQueryString() {

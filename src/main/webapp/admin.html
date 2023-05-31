@@ -10,12 +10,43 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css" integrity="sha384-jLKHWM3JRmfMU0A5x5AkjWkw/EYfGUAGagvnfryNV3F9VqM98XiIH7VBGVoxVSc7" crossorigin="anonymous">
+<script src = "node_modules/axios/dist/axios.min.js"></script>
 
+<script> 
+     function checkUser(){
+        let headers = {'Content-Type':'application/json'};
+    //    let response =   await fetch('http://192.168.246.155:8080/attendance/ac/checkFingerprint', {
+    //     Method:'POST',
+    //      headers:{
+    //         Accept: 'application.json',
+    //         'Content-Type':'application/json'
+    //     },
+    //      body: JSON.stringify( 
+    //          {
+    //            "EMPLOYEE_NAME":"Ut"
+    //          })
+    //    })
+
+    axios.post("http://192.168.246.155:8080/attendance/ac/checkFingerprint", {
+                "FINGERPRINT_ID":"1"
+          }, headers).then((response) => {
+  console.log(response.json);
+}, (error) => {
+  console.log(error);
+});
+
+    //    let json = await response.json();
+       
+    //    .then( response => await response.json()).then(jsonResp=>console.log(jsonResp)).catch(err=>alert(err))
+    //    console.log(json);
+    //    console.log(response.json());
+    }
+</script>
 </head>
 <body>
     <section class="header">
         <nav>
-            <a href="index.html"><img src="images/logo.jpeg"></a>
+            <a href="index.html">hu</a>
             <div class="nav-links" id="navLinks">
                 <i class="fa fa-times" onclick="hideMenu()"></i>
                 <ul>
@@ -33,7 +64,7 @@
                 <input type="text" name="" placeholder="Enter Admin name">
                 <p>Password</p>
                 <input type="password" name="" placeholder="Enter Password">
-                <input type="submit" name="" value="Login" >
+                <input type="submit" name="" value="Login" onclick = checkUser() >
                 <a href="#">Forget your password?</a>
             </form>
         </div>    

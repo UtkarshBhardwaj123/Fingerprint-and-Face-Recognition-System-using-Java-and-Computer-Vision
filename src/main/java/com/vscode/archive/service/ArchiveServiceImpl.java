@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ArchiveServiceImpl implements ArchiveService {
-	public void deleteById() {
+	
+	@Override
+	public void deleteBulk() {
 		
 	}
 }

@@ -1,5 +1,6 @@
 package com.vscode.entity.archive;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -12,7 +13,11 @@ import com.vscode.entity.attendance.StudentDetails;
 @Entity
 @Table(name = "STUDENT_ARCHIVE")
 public class StudentArchiveBean extends StudentDetails {
+	
+	@Column(name="REMARKS")
 	private String remarks;
+	
+	@Column(name="REASON")
 	private String reason;
 
 	public String getRemarks() {

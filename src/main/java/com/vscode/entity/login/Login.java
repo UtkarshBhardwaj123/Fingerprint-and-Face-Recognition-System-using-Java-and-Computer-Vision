@@ -16,6 +16,7 @@ public class Login {
 	@Column(name ="LOGIN_ID")
 	private String loginID;
 
+	@Column(name = "PASSWORD")
 	private String password;
 
 	public Login() {

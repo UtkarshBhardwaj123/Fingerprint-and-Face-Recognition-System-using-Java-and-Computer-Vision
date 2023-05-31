@@ -1,111 +1,244 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USER PAGE</title>
-    <link rel="stylesheet" href="user.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css" integrity="sha384-jLKHWM3JRmfMU0A5x5AkjWkw/EYfGUAGagvnfryNV3F9VqM98XiIH7VBGVoxVSc7" crossorigin="anonymous">
+<html>
+ 
 
+  <style>
+body {
+  align-items: center;
+
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  background-image: url('background.jpeg');
+  background-attachment: fixed;
+  background-size: cover;
+
+  background-repeat: no-repeat;
+}
+
+.form {
+  background-image: linear-gradient(  rgb(188, 34, 137), rgb(54, 101, 241));  border-radius: 20px;
+  box-sizing: border-box;
+  height: 500px;
+  width: 2020px;
+}
+
+.title {
+  color: #eee;
+  font-family: sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  margin-top: 30px;
+}
+
+.subtitle {
+  color: #eee;
+  font-family: sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.input-container {
+  height: 80px;
+  position: relative;
+  
+}
+
+.ic1 {
+  margin-top: 40px;
+}
+
+.ic2 {
+  margin-top: 30px;
+}
+
+.input {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 0;
+  box-sizing: border-box;
+  color: #0c0c0c;
+  font-size: 18px;
+  height: 100%;
+  outline: 0;
+  padding: 4px 20px 0;
+  width: 100%;
+}
+
+.cut {
+  background-color: #cdd357;
+  border-radius: 10px;
+  height: 20px;
+  left: 20px;
+  position: absolute;
+  top: -20px;
+  transform: translateY(0);
+  transition: transform 200ms;
+  width: 110px;
+  padding: 12px;
+}
+
+.cut-short {
+  width: 50px;
+}
+
+.input:focus ~ .cut,
+.input:not(:placeholder-shown) ~ .cut {
+  transform: translateY(8px);
+}
+
+.placeholder {
+  color: #65657b;
+  font-family: sans-serif;
+  left: 20px;
+  line-height: 14px;
+  pointer-events: none;
+  position: absolute;
+  transform-origin: 0 50%;
+  transition: transform 200ms, color 200ms;
+  top: 20px;
+}
+
+.input:focus ~ .placeholder,
+.input:not(:placeholder-shown) ~ .placeholder {
+  transform: translateY(-30px) translateX(10px) scale(0.75);
+}
+
+.input:not(:placeholder-shown) ~ .placeholder {
+  color: #808097;
+}
+
+.input:focus ~ .placeholder {
+  color: #dc2f55;
+}
+
+.submit {
+  background-color: #08d;
+  border-radius: 12px;
+  border: 0;
+  box-sizing: border-box;
+  color: #eee;
+  cursor: pointer;
+  font-size: 18px;
+  height: 50px;
+  margin-top: 35px;
+  outline: 0;
+  text-align: center;
+  width: 300px;
+  float:right;
+}
+
+.submit:active {
+  background-color: #06b;
+}
+.col{
+    padding: 10px;
+}
+.entry{
+  background-color: #fafafa;
+  border:0;
+  box-shadow:0 0 4px rgba(0,0,0,0.3);
+  transition: .3s box-shadow;
+}
+.writing{
+  color: #eee;
+  font-size: 18px;
+  background-color: #e8e9f4;
+  border-radius: 12px;
+  border: 0;
+  box-sizing: border-box;
+}
+
+
+
+  </style>
+   <head>
+    <!-- Latest compiled and minified CSS -->
+    <link async rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script defer src=  "register.js"> </script>
 </head>
-<style>
-    .table{
-        margin-top: -40px;
-        margin-left: 225px;
-        /* margin-bottom: 10px; */
-        color: aliceblue;
-    }
-</style>
 <body>
-    <section class="header">
-        <nav>
-            <a href="index.html"><img src="images/logo.png"></a>
-            <div class="nav-links" id="navLinks">
-                <i class="fa fa-times" onclick="hideMenu()"></i>
-                <ul>
-                    <li><a href="index.html">HOME</a></li>
-                    <li><a href="attendance.html">ATTENDANCE</a></li>
-                    <li><a href="admin.html">ADMIN</a></li>
-                </ul>
-            </div>
-            <i class="fa fa-bars" onclick="showMenu()"></i>
-        </nav>
-        <div>
-        <div class="login">
-            <h1>User details</h1>
-            <form action="">
-                <p>Username</p>
-                <input type="text" name="" placeholder="Enter Username">
-                <p>Password</p>
-                <input type="password" name="" placeholder="Enter Password">
-                <input type="submit" name="" value="Login">
-                <a href="#">Lost your password?</a>
-                <a href="#">Don't have an account?</a>
-            </form>
-        </div>
-            <div class="table">
-                <table class="table1">
-                    <thead class="thead-light">
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Father Name</th>
-                        <th scope="col">Mother Name</th>
-                        <th scope="col">Adm. No.</th>
-                        <th scope="col">Adm. Date</th>
-                        <th scope="col">Roll. No.</th>
-                        <th scope="col">Class</th>
-                        <th scope="col">Section</th>
-                        <th scope="col">Student status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>Yash</td>
-                        <td>26</td>
-                        <td>ECE</td>
-                        <td>A</td>
-                        <td>50</td>
-                        <td>45</td>
-                        <td>5</td>
-                        <td>24 May</td>
-                        <td>Present</td>                   
-                      </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>Pankaj</td>
-                        <td>29</td>
-                        <td>ECE</td>
-                        <td>A</td>
-                        <td>50</td>
-                        <td>42</td>
-                        <td>8</td>
-                        <td>24 May</td>
-                        <td>Present</td>   
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>Utkarsh</td>
-                        <td>24</td>
-                        <td>ECE</td>
-                        <td>A</td>
-                        <td>50</td>
-                        <td>40</td>
-                        <td>10</td>
-                        <td>24 May</td>
-                        <td>Present</td>   
-                      </tr>
-                    </tbody>
-                  </table>
+<div class="form">
+  <div class="container">
+    <h1 style="color:white; padding:10px;"><center>USER REGISTRATION</center></h1>
+    <div class="row align-items-start input-container ">
+      <div class="col input-container">
+        <input id="Employee_Name" class="input" type="text" placeholder=" " />
+        <div class="cut"></div>
+        <label for="Employee_Name" class="placeholder">Employee Name</label>
+      </div>
+      <div class="col input-container">
+        <input required id="Mobile_Number" class="input" type="text" placeholder=" " />
+        <div class="cut"></div>
+        <label for="Mobile_Number" class="placeholder">Mobile Number</label>
+      </div>
+      <div class="col input-container">
+        <input id="Father_Name" class="input" type="text" placeholder=" " />
+        <div class="cut"></div>
+        <label for="Father_Name" class="placeholder">Father Name</label>
+      </div>
+    </div>
+    <div class="row align-items-center ic1">
+      <div class="col input-container">
+        <input id="Department" class="input" type="text" placeholder=" " />
+        <div class="cut"></div>
+        <label for="Department" class="placeholder">Department</label>
+      </div>
+      
+      <div class="col writing ">
+<select id = "Gender" style="background-color: rgb(245, 240, 240);
+border-radius: 12px;
+border: 0;
+box-sizing: border-box; padding: 8px; width: 100%;">
+<option value = "select"> Select Gender
+</option>
+<option value = "Male"> Male 
+</option>
+<option value = "Female"> Female
+</option>
+<option value = "Transgender"> Transgender
+</option>
+</select>
+      </div>
+    
+      <div class="col input-container">
+        <input id="Dob" class="input" type="date" placeholder=" " />
+        <div class="cut"></div>
+        <label for="Dob" class="placeholder">DOB</label>
+        
 
-            </div>
-        </div>    
-    </section>    
-
+</div>
+    </div>
+    <div class="row align-items-start input-container ic2 ">
+      <div class="col input-container">
+        <input id="Doj" class="input" type="date" placeholder=" " />
+        <div class="cut"></div>
+        <label for="Doj" class="placeholder" style="color: black;">Date of Joining</label>
+        
+      </div>
+      <div class="col input-container">
+        <input id="Location" class="input" type="text" placeholder=" " />
+        <div class="cut"></div>
+        <label for="Location" class="placeholder">Location</label>
+      </div>
+      <div class="col writing " style="margin-top: 8px;">
+        
+<select id ="Working_Status" style="background-color: rgb(246, 243, 243);
+border-radius: 12px;
+border: 0;
+box-sizing: border-box; padding:8px;width: 100%;">
+<option value = "select"> Working Status
+</option>
+<option value = "Work_from_home"> Work from home 
+</option>
+<option value = "Work_from_office"> Work from office
+</option>
+<option value = "Hybrid"> Hybrid
+</option>
+</select>
+      </div>
+</div>
+<a href="video.html" > <button type="text" class="submit" onclick="onSubmit()">submit</button></a> 
 </body>
 </html>

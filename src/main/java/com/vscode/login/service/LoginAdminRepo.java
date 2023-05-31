@@ -6,9 +6,9 @@ import com.vscode.common.repo.DefaultRepo;
 import com.vscode.entity.login.LoginAdminBean;
 
 /**
- * @author Utkarsh Bhardwaj 
+ * @author Utkarsh Bhardwaj
  */
 
 @Repository("loginAdminRepo")
-public interface LoginAdminRepo extends DefaultRepo<LoginAdminBean, String>{
+public interface LoginAdminRepo extends DefaultRepo<LoginAdminBean, String> {
 }

@@ -17,6 +17,7 @@ import javax.persistence.Table;
 @IdClass(StudentAttendancePKId.class)
 public class StudentAttendanceBean {
 
+	@Column(name = "NAME")
 	private String name;
 
 	// primary keys
@@ -27,16 +28,22 @@ public class StudentAttendanceBean {
 	@Column(name = "CLASS")
 	private String batch;
 	@Id
+	@Column(name = "SECTION")
 	private String section;
-@Column(name = "TOTAL_DAYS_OPENED")
+
+	@Column(name = "TOTAL_DAYS_OPENED")
 	private int totalDaysOpened;
-@Column(name="TOTAL_DAYS_PRESENT")
+
+	@Column(name = "TOTAL_DAYS_PRESENT")
 	private int totalDaysPresent;
-@Column(name ="TOTAL_DAYS_ABSENT")
+
+	@Column(name = "TOTAL_DAYS_ABSENT")
 	private int totalDaysAbsent;
-@Column(name ="LAST_ATTENDANCE_DAY")
+
+	@Column(name = "LAST_ATTENDANCE_DAY")
 	private Date lastAttendanceDay;
-@Column(name ="STUDENT_STATUS")
+
+	@Column(name = "STUDENT_STATUS")
 	private String studentStatus;
 
 	public StudentAttendanceBean() {
@@ -65,11 +72,11 @@ public class StudentAttendanceBean {
 		this.name = name;
 	}
 
-	public byte getrollNo() {
+	public byte getRollNo() {
 		return rollNo;
 	}
 
-	public void setrollNo(byte rollNo) {
+	public void setRollNo(byte rollNo) {
 		this.rollNo = rollNo;
 	}
 

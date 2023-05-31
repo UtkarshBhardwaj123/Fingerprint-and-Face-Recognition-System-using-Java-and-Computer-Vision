@@ -8,7 +8,7 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "ADMIN")
+@Table(name = "ADMIN", schema = "LOGIN")
 public class LoginAdminBean extends Login {
 
 	public LoginAdminBean() {

@@ -6,6 +6,6 @@ package com.vscode.archive.service;
 
 public interface ArchiveService {
 
-	public void deleteById();
+	public void deleteBulk();
 
 }

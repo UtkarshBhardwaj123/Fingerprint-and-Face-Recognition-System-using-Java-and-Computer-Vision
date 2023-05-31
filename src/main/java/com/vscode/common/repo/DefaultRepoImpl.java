@@ -1,26 +1,39 @@
 package com.vscode.common.repo;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.transform.AliasToBeanResultTransformer;
-import org.hibernate.transform.ResultTransformer;
-import org.hibernate.transform.ToListResultTransformer;
-import org.hibernate.transform.Transformers;
-//import com.vscode.common.Filter;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.Table;
+import org.hibernate.metamodel.internal.MetamodelImpl;
+import org.hibernate.persister.entity.EntityPersister;
+
+import com.vscode.common.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.vscode.common.Aggregate;
 import com.vscode.common.CommonUtil;
 import com.vscode.common.Criteria;
 import com.vscode.common.CriteriaType;
@@ -31,9 +44,11 @@ import com.vscode.common.CriteriaType;
 public class DefaultRepoImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID>
 		implements DefaultRepo<T, ID> {
 	@Autowired
-	private EntityManager entityManager;
+	protected EntityManager entityManager;
 
-	private JpaEntityInformation<T, ?> entityInformation;
+	protected JpaEntityInformation<T, ?> entityInformation;
+
+	private static final String PR_NEW_FINGERPRINT_ID = "ATTENDANCE.NEW_FINGERPRINT_ID";
 
 	public DefaultRepoImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
 		super(entityInformation, entityManager);
@@ -41,17 +56,38 @@ public class DefaultRepoImpl<T, ID extends Serializable> extends SimpleJpaReposi
 		this.entityInformation = entityInformation;
 	}
 
-//	public DefaultRepoImpl(Class<T> domainClass, EntityManager entityManager) {
-//		super(domainClass, entityManager);
-//		this.entityManager = entityManager;
-//	}
-//j
 	@Override
-	public List<Map<String, Object>> loadAll(com.vscode.common.Filter filter) {
+	/**
+	 * specifically created for executing custom Select Query so that we can have
+	 * dynamic where clause
+	 **/
+	public List<Map<String, Object>> loadAll(Filter filter) {
 		try {
+			// springboot jpa hibernate
 			Session session = entityManager.unwrap(Session.class);
 
-		List<LinkedHashMap<String,Object>> result = (List<LinkedHashMap<String, Object>>) session.createQuery(createSpecialSelectQuery(filter)).list();
+			// JDBC Services
+			JdbcServices jdbcServices = ((SessionFactoryImplementor) session.getSessionFactory()).getJdbcServices();
+
+			// getting current Catalog in use or Database in use for MySQL
+			String currentCatalog = jdbcServices.getJdbcEnvironment().getCurrentCatalog().toString();
+
+			if (currentCatalog == null)
+				return new ArrayList<Map<String, Object>>();
+
+			/**
+			 * Using object of our implemented Integrator(CustomIntegrator) to get the
+			 * PersistentClass for the specified entity currently used in query to get the
+			 * object of table
+			 **/
+			Table table = CustomIntegrator.getMap(currentCatalog).getMetadata()
+					.getEntityBinding(getDomainClass().getName()).getTable();
+
+			// Using hibernate and jdbc
+			return createNativeQuery(table, jdbcServices, filter);
+
+			// hibernate
+//		    System.out.println(customManager.getDynaBean());
 //			Query<Map<String, Object>> result = session.createQuery(createSpecialSelectQuery(filter))
 //					.setResultTransformer(new ResultTransformer() {
 //
@@ -71,52 +107,68 @@ public class DefaultRepoImpl<T, ID extends Serializable> extends SimpleJpaReposi
 //							return (List<Map<String, Object>>) collection;
 //						}
 //					});
-//			
-			return (List<Map<String, Object>>) session.createQuery(createSpecialSelectQuery(filter)).list();
+////			
+//			return (List<Map<String, Object>>) session.createQuery(createSpecialSelectQuery(filter)).list();
 //			return resultList;
 //		return (ArrayList<Map<String, Object>>)query.getResultList();
-
-		} catch (HibernateException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
-
 		}
 		return new ArrayList<Map<String, Object>>();
 	}
 
-	@Override
-	public String createSpecialSelectQuery(com.vscode.common.Filter filter) {
+	private String createSpecialSelectQuery(String tableName, com.vscode.common.Filter filter) {
 		try {
-			StringBuilder selectQuery = new StringBuilder("Select new map( ");
+			if(filter.getQueryString()!=null && !filter.getQueryString().trim().isEmpty())
+				return filter.getQueryString();
+			
+			StringBuilder selectQuery = new StringBuilder("Select ");
 
 			List<String> selectCols = filter.getSelectColumns();
 
+			Aggregate aggFunc = filter.getAggFunc();
+			boolean aggUsed = !CommonUtil.checkNull(aggFunc);
+			boolean isDistinct = filter.isDistinct();
+
+			if (aggUsed) {
+				if (isDistinct) {
+					selectQuery.append("Distinct ");
+					isDistinct = false;
+				}
+				selectQuery.append(aggFunc.toString()).append("(").append(filter.getAggColumn()).append(")");
+			}
+
 			if (!CommonUtil.checkNull(selectCols)) {
 
-				if (filter.isDistinct() && !CommonUtil.checkNull(selectCols))
+				if (aggUsed)
+					selectQuery.append(", ");
+
+				if (isDistinct)
 					selectQuery.append("Distinct ");
 
-				selectCols.stream().forEach(in -> {
+				selectCols.forEach(in -> {
 					selectQuery.append(in);
 					if (selectCols.indexOf(in) < selectCols.size() - 1)
 						selectQuery.append(", ");
+					else
+						selectQuery.append(" ");
 
 				});
-			}
-			System.out.println(getDomainClass());
-			selectQuery.append(" ) from ").append(entityInformation.getEntityName() + " e");
+			} else
+				selectQuery.append("* ");
 
-			if (filter != null) {
+			selectQuery.append("from ").append(tableName);
+			if (filter.getCriteriaSet() != null && !filter.getCriteriaSet().isEmpty())
 				selectQuery.append(" where " + filterQuery(filter));
-				if (!CommonUtil.checkNull(filter.getOrderBy())) {
-					selectQuery.append(" order by ").append(filter.getOrderBy()).append(filter.getSort().toString());
-				}
-
-				if (!CommonUtil.checkNull(filter.getGroupByColumns()))
-					filter.getGroupByColumns().stream()
-							.forEach(in -> selectQuery.append(" group by ").append(filter.getGroupByColumns()));
+			if (!CommonUtil.checkNull(filter.getOrderBy())) {
+				selectQuery.append(" order by ").append(filter.getOrderBy()).append(" " + filter.getSort().toString());
 			}
 
-			System.out.println(selectQuery.toString());
+			if (!CommonUtil.checkNull(filter.getGroupByColumns()))
+				filter.getGroupByColumns().stream()
+						.forEach(in -> selectQuery.append(" group by ").append(filter.getGroupByColumns()));
+
+			System.out.println(selectQuery.toString() + ";");
 			return selectQuery.toString();
 		} catch (Exception e) {
 			System.out.println(e);
@@ -125,8 +177,7 @@ public class DefaultRepoImpl<T, ID extends Serializable> extends SimpleJpaReposi
 
 	}
 
-	@Override
-	public String filterQuery(com.vscode.common.Filter filter) {
+	protected String filterQuery(Filter filter) {
 		try {
 			StringBuilder whereClause = new StringBuilder();
 
@@ -141,12 +192,11 @@ public class DefaultRepoImpl<T, ID extends Serializable> extends SimpleJpaReposi
 					whereClause.append(" AND");
 			}
 			if (!CommonUtil.checkNullCriteria(criteria)) {
-				for (Criteria criterion : criteria) {
-					System.out.println("yes");
+				criteria.forEach(criterion -> {
 					if (!criterion.equals(criteria.get(0)) && criteria.size() > 1)
 						whereClause.append(" AND ");
 
-					whereClause.append("e." + criterion.getColumn());
+					whereClause.append(criterion.getColumn());
 					CriteriaType criteriaType = criterion.getCriteriaType();
 					boolean hasValue = true;
 					switch (criteriaType) {
@@ -207,8 +257,14 @@ public class DefaultRepoImpl<T, ID extends Serializable> extends SimpleJpaReposi
 						hasValue = false;
 						break;
 					case In:
-						whereClause.append(" IN ").append(
-								criterion.getInValues().stream().map(in -> in + ",").collect(Collectors.toList()));
+						whereClause.append(" IN ( ");
+						List<String> inValues = criterion.getInValues();
+						inValues.forEach(in -> {
+							whereClause.append(in);
+							if (inValues.get(inValues.size() - 1) != in)
+								whereClause.append(", ");
+						});
+						whereClause.append(")");
 						hasValue = false;
 						break;
 					case LeftParenthesis:
@@ -224,7 +280,8 @@ public class DefaultRepoImpl<T, ID extends Serializable> extends SimpleJpaReposi
 					if (criterion.getValue() != null && hasValue)
 						appendValue(whereClause, true, 0, criterion.getValue());
 
-				}
+				});
+
 				return whereClause.toString();
 			}
 
@@ -234,17 +291,184 @@ public class DefaultRepoImpl<T, ID extends Serializable> extends SimpleJpaReposi
 		return "";
 	}
 
-	public void createUpdateStatement(com.vscode.common.Filter filter) {
-		StringBuilder update = new StringBuilder("Update");
-		update.append(getDomainClass().getName());
-
-	}
+//	public void createUpdateStatement(com.vscode.common.Filter filter) {
+//		StringBuilder update = new StringBuilder("Update");
+//		update.append(getDomainClass().getName());
+//		update.append(" set ");
+//
+//	}
 
 	private void appendValue(StringBuilder clause, boolean isString, int dataType, String value) {
 		if (isString)
 			clause.append("'").append(value).append("'");
 		else
 			clause.append(value);
+	}
+
+	@SuppressWarnings("restriction")
+	private List<Map<String, Object>> getListOfMap(Iterator<Column> columns, ResultSet resultSet, Filter filter)
+			throws SQLException, NativeException {
+		List<Map<String, Object>> dynaBeans = new ArrayList<Map<String, Object>>();
+
+		if (columns == null)
+			throw new NativeException("Columns are not listed means issue in connectivity our "
+					+ "database check in CustomIntegrator or DefaultRepoImpl");
+
+		List<String> columnNames = getColumnList(columns, filter);
+
+		while (resultSet.next()) {
+
+			Map<String, Object> dynaBean = new HashMap<>();
+
+			for(String column:columnNames) {
+
+				try {
+
+					if (column != null && resultSet.getObject(column) != null) {
+//						System.out.println(resultSet.getMetaData().getColumnType(resultSet.findColumn(column)));
+						if (resultSet.getMetaData()
+								.getColumnType(resultSet.findColumn(column)) == Types.LONGVARBINARY) {
+							Blob blob = resultSet.getBlob(column);
+//							File file = new File("D:/image.jpeg");
+//
+//							BufferedImage buff = ImageIO.read(
+//									new ByteArrayInputStream(blob.getBytes(1, (int) blob.length())));
+//							ImageIO.write(buff, "jpeg", file);
+							dynaBean.put(column, Base64.getEncoder()
+									.encode(blob.getBinaryStream(1, blob.length()).readAllBytes()).toString());
+						} else
+							dynaBean.put(column, resultSet.getObject(column).toString());
+
+					}}
+				catch (SQLException | IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			dynaBeans.add(dynaBean);
+
+		}
+		dynaBeans.forEach(in -> in.forEach((key, val) -> System.out.println(key + " " + val)));
+
+		return dynaBeans;
+	}
+
+	private List<String> getColumnList(Iterator<Column> iterator, Filter filter) {
+		List<String> list = new ArrayList<>();
+		boolean selectedCols = !CommonUtil.checkNull(filter.getSelectColumns());
+		boolean aggUsed = filter.getAggFunc() != null;
+
+		if (selectedCols)
+			filter.getSelectColumns().forEach(in -> list.add(in));
+
+		if (aggUsed)
+			list.add(new StringBuilder().append(filter.getAggFunc().toString()).append("(")
+					.append(filter.getAggColumn()).append(")").toString());
+
+		else if (!selectedCols && !aggUsed)
+			iterator.forEachRemaining(in -> list.add(in.getName()));
+
+		return list;
+	}
+
+	/**
+	 * getDynaBeans can be used while we use any predefined method for doing any
+	 * Read Operation in Service Class
+	 * 
+	 * @param List<Entity>
+	 * @return DynaBeans(List<Map<String, Object>>)
+	 **/
+	public List<Map<String, Object>> getDynaBeans(List<T> entities) {
+		List<Map<String, Object>> dynaBeans = new ArrayList<>();
+
+		EntityPersister entityPersister = ((MetamodelImpl) entityManager.getMetamodel())
+				.entityPersister(getDomainClass().getName());
+
+		// not more than 128 columns will be allowed
+		entities.forEach(entity -> {
+			Map<String, Object> data = new HashMap<String, Object>();
+			String[] names = entityPersister.getPropertyNames();
+			for (byte i = 0; i < names.length; i++)
+				data.put(names[i], entityPersister.getPropertyValue(entity, i));
+			dynaBeans.add(data);
+		});
+
+		return dynaBeans;
+	}
+
+//	public void update(String column, Object value, Expression<Boolean> criteria) {
+//		if(column != null && value != null && criteria != null)
+//         entityManager.getCriteriaBuilder().createCriteriaUpdate(getDomainClass()).set(column, value).where(criteria);
+//	}
+
+	private List<Map<String, Object>> createNativeQuery(Table table, JdbcServices jdbcServices, Filter filter)
+			throws SQLException {
+
+		Connection conn = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+
+		try {
+			// using JDBCServices to obtain the object of Connection
+			conn = jdbcServices.getBootstrapJdbcConnectionAccess().obtainConnection();
+			statement = conn.prepareStatement(createSpecialSelectQuery(table.getName(), filter));
+			rs = statement.executeQuery();
+
+			if (rs == null)
+				return null;
+
+			return getListOfMap(table.getColumnIterator(), rs, filter);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (NativeException e) {
+			System.out.println(e);
+		} finally {
+			closeResources(conn, statement, rs);
+		}
+		throw new SQLException();
+//		SqlExceptionHelper spi
+	}
+
+	// don't remove @Transactional annotation as it is required for calling a
+	// procedure it's not creating any read only statement,
+	// whether u have made changes in the database or not creating the
+	// procedure but calling a procedure is considered itself
+	// as making changes in db.
+	@Override
+	@Transactional
+	public Map<String, Object> callProcedure() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		StoredProcedureQuery query = entityManager.createStoredProcedureQuery(PR_NEW_FINGERPRINT_ID);
+
+		query.registerStoredProcedureParameter("NEW_FINGERPRINT_ID", Byte.class, ParameterMode.OUT);
+		query.registerStoredProcedureParameter("NEW_EMPLOYEE_ID", Short.class, ParameterMode.OUT);
+
+		if (!query.execute()) {
+			map.put("FINGERPRINT_ID", query.getOutputParameterValue("NEW_FINGERPRINT_ID"));
+			map.put("EMPLOYEE_ID", query.getOutputParameterValue("NEW_EMPLOYEE_ID"));
+		}
+		return map;
+	}
+
+	private void closeResources(Connection conn, PreparedStatement statement, ResultSet rs) {
+		try {
+			if (conn != null)
+				conn.close();
+		} catch (SQLException e) {
+		}
+		try {
+			if (rs != null)
+				rs.close();
+		} catch (SQLException e) {
+
+		}
+		try {
+			if (statement != null)
+				statement.close();
+		} catch (SQLException e) {
+
+		}
+
 	}
 
 }

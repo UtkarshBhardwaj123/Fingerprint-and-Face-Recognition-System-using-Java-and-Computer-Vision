@@ -8,6 +8,6 @@ import com.vscode.entity.attendance.StudentAttendancePKId;
  * @author Utkarsh Bhardwaj 
  */
 
-public interface StudentAttendanceRepo extends  DefaultRepo<StudentAttendanceBean, StudentAttendancePKId> {
+public interface StudentAttendanceRepo extends  DefaultRepo<StudentAttendanceBean, StudentAttendancePKId>{
 
 }

@@ -7,16 +7,110 @@
 		<version>2.7.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.vscode.common.server</groupId>
 	<artifactId>com.vscode.attendance</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>com.vscode.attendance</name>
 	<description>Project for attendance system</description>
+	<packaging>war</packaging>
+
 	<properties>
 		<java.version>1.8</java.version>
 		<jackson.version>2.13.0</jackson.version>
+		<start-class>com.vscode.Application</start-class>
 	</properties>
+
 	<dependencies>
+
+		<!--dependency>
+			<groupId>org.bytedeco</groupId>
+			<artifactId>javacpp</artifactId>
+			<version>1.5.4</version>
+		</dependency-->
+
+		<!--dependency>
+     <groupId>org.bytedeco</groupId>
+     <artifactId>cuda-platform-redist</artifactId>
+     <version>11.0-8.0-1.5.4</version>
+ </dependency-->
+		<dependency>
+			<groupId>org.bytedeco</groupId>
+			<artifactId>cuda</artifactId>
+			<version>11.0-8.0-1.5.4</version>
+		</dependency>
+
+		<!--dependency>
+			<groupId>org.jcuda</groupId>
+			<artifactId>jcuda</artifactId>
+			<version>11.0.0</version>
+		</dependency-->
+
+		<dependency>
+			<groupId>org.jcuda</groupId>
+			<artifactId>jcublas</artifactId>
+			<version>11.0.0</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.nd4j</groupId>
+			<artifactId>nd4j-cuda-11.0</artifactId>
+			<version>1.0.0-M1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.nd4j</groupId>
+			<artifactId>nd4j-cuda-11.0</artifactId>
+			<version>1.0.0-M1.1</version>
+			<classifier>windows-x86_64-cudnn</classifier>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.deeplearning4j</groupId>
+			<artifactId>deeplearning4j-core</artifactId>
+			<version>1.0.0-M1.1</version>
+		</dependency>
+
+		<!--dependency>
+			<groupId>org.deeplearning4j</groupId>
+			<artifactId>deeplearning4j-nn</artifactId>
+			<version>1.0.0-M1.1</version>
+		</dependency-->
+		<dependency>
+			<groupId>org.deeplearning4j</groupId>
+			<artifactId>deeplearning4j-zoo</artifactId>
+			<version>1.0.0-M1.1</version>
+		</dependency>
+
+
+		<!--dependency>
+			<groupId>org.deeplearning4j</groupId>
+			<artifactId>deeplearning4j-cuda-11.0</artifactId>
+			<version>1.0.0-M1.1</version>
+		</dependency-->
+
+
+		<!-- dependency>
+    <groupId>org.nd4j</groupId>
+    <artifactId>nd4j-native-platform</artifactId>
+    <version>1.0.0-M2.1</version>
+</dependency-->
+
+
+		<!--dependency>
+	<groupId>org.bytedeco</groupId>
+	<artifactId>openBlas-javacpp</artifactId>
+	<version>1.5.4</version>
+	</dependency-->
+
+		<!--dependency>
+			<groupId>org.openpnp</groupId>
+			<artifactId>opencv</artifactId>
+			<version>3.2.0-1</version>
+		</dependency-->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -87,10 +181,41 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 		</dependency>
-	</dependencies>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20220924</version>
+		</dependency>
+	</dependencies>
 	<build>
+
 		<plugins>
+			<!--plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.4.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin-->
+
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

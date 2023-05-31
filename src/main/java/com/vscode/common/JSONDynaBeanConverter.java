@@ -1,28 +1,33 @@
 package com.vscode.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.Blob;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.nd4j.linalg.factory.Nd4j;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vscode.controller.LoginController;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.vscode.login.service.LoginService;
-import com.vscode.login.service.LoginServiceImpl;
+import com.vscode.recognizeface.InputVector;
 
 public class JSONDynaBeanConverter {
 
 	private List<Map<String, Object>> dynaBean = new ArrayList<Map<String, Object>>();
 
 //	private ObjectMapper objectMapper = new ObjectMapper();
-	String column = null;
+	private LoginService loginService;
 
 	public Map<String, Object> convertJSONToDynaBeans(JSONObject jsonObj) {
 
@@ -37,20 +42,29 @@ public class JSONDynaBeanConverter {
 		Map<String, Object> data = new HashMap<String, Object>();
 		for (String column : columns) {
 			try {
-				this.column = column;
 				if (CommonUtil.checkNull(jsonObj.getString(column)))
 					continue;
 
-				else if (isAdmin()) {
+				else if (column.equalsIgnoreCase("isAdmin"))
 
-					continue;
+					loginService.setAdmin(Boolean.parseBoolean(jsonObj.getString(column)));
+				else if (column.equalsIgnoreCase("saveAdmin")) {
+
+					loginService.setSaveAdmin(Boolean.parseBoolean(jsonObj.getString(column)));
+				} else if (column.equalsIgnoreCase("EMPLOYEE_IMAGE")) {
+//					ObjectReader fr = new ObjectReader();
+					byte[] imageArray = Base64.getDecoder().decode(jsonObj.get("EMPLOYEE_IMAGE").toString().trim());
+					data.put(column, imageArray);
+
+//					data.put("INPUT_VECTOR",
+//							new InputVector().createInputVector(ImageIO.read(new ByteArrayInputStream(imageArray))));
 				} else {
 
 					data.put(column, jsonObj.get(column));
 				}
 			} catch (JSONException e) {
-				System.out.print("");
-			}
+				System.out.print("JSON Exception");
+			} 
 		}
 		return data;
 
@@ -63,6 +77,7 @@ public class JSONDynaBeanConverter {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			Map<String, Object> data = convertJSONToDynaBeans(jsonArray.getJSONObject(i));
 			if (data != null && !data.isEmpty())
+
 				addToDynaBean(data);
 		}
 	}
@@ -82,7 +97,7 @@ public class JSONDynaBeanConverter {
 
 		return jsonObj;
 	}
-	
+
 	public Object getJsonObject(JSONObject input, String key) {
 		try {
 			return input.get(key);
@@ -95,16 +110,46 @@ public class JSONDynaBeanConverter {
 		return dynaBean;
 	}
 
-	public void setDynaBean(List<Map<String, Object>> dynaBean) {
+	public void setDynaBeans(List<Map<String, Object>> dynaBean) {
 		this.dynaBean = dynaBean;
+	}
+
+	public void setDynaBeans(JSONArray jsonArray) throws JSONException {
+		List<Map<String, Object>> dynaBeans = new ArrayList<Map<String, Object>>();
+		for (int i = 0; i < jsonArray.length(); i++) {
+			Map<String, Object> data = convertJSONToDynaBeans(jsonArray.getJSONObject(i));
+			if (data != null && !data.isEmpty())
+
+				dynaBeans.add(data);
+		}
+		setDynaBeans(dynaBeans);
 	}
 
 	public void addToDynaBean(Map<String, Object> data) {
 		dynaBean.add(data);
 	}
 
-	public boolean isAdmin() {
-		return column.equals("isAdmin");
+	public void addToDynaBean(LoginService loginService, JSONObject input) {
+		if (input == null)
+			return;
+		this.loginService = loginService;
+		addToDynaBean(convertJSONToDynaBeans(input));
+
 	}
 
+	public JSONArray convertDynaBeansToJSONArray(List<Map<String, Object>> dynaBeans) {
+		JSONArray jsonArray = new JSONArray();
+		if (dynaBeans != null && !dynaBeans.isEmpty())
+			dynaBeans.forEach(dynaBean -> jsonArray.put(convertDynaBeanToJSON(dynaBean)));
+		return jsonArray;
+	}
+
+	public JSONArray getJSONArray(JSONObject input, String key) throws JSONException {
+		return input.getJSONArray(key);
+
+	}
+
+	public void addToDynaBean(JSONObject jsonObj) {
+		addToDynaBean(convertJSONToDynaBeans(jsonObj));
+	}
 }

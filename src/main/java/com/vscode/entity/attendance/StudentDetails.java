@@ -3,6 +3,7 @@ package com.vscode.entity.attendance;
 import java.math.BigInteger;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
@@ -13,18 +14,33 @@ import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public class StudentDetails {
+	@Column(name ="NAME")
 	private String name;
+	
+	@Column(name="FATHERS_NAME")
 	private String fathersName;
+	
+	@Column(name="MOTHERS_NAME")
 	private String mothersName;
 
 	// Primary Key
 	@Id
+	@Column(name="ADMISSION_NO")
 	private BigInteger admissionNo;
 
+	@Column(name="ADMISSION_DATE")
 	private Date admissionDate;
+	
+	@Column(name="ROLL_NO")
 	private byte rollNo;
+	
+	@Column(name="CLASS")
 	private String batch;
+	
+	@Column(name="SECTION")
 	private String section;
+	
+	@Column(name="STUDENT_STATUS")
 	private String stdStatus;
 
 	public StudentDetails() {

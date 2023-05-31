@@ -11,7 +11,7 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name="STUDENT_DETAILS")
+@Table(name="STUDENT_DETAILS", schema="ATTENDANCE")
 public class StudentDetailsBean extends StudentDetails {
 
 	public StudentDetailsBean() {

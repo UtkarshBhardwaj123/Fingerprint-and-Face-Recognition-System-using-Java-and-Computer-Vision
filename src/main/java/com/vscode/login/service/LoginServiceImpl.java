@@ -1,16 +1,13 @@
 package com.vscode.login.service;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import com.vscode.common.Filter;
-import com.vscode.common.repo.DefaultRepoImpl;
 import com.vscode.entity.login.Login;
 import com.vscode.entity.login.LoginAdminBean;
 import com.vscode.entity.login.LoginUserBean;
@@ -21,12 +18,15 @@ import com.vscode.entity.login.LoginUserBean;
 
 @Component
 public class LoginServiceImpl implements LoginService {
-	private boolean isAdmin = false;
 	@Autowired
 	private LoginAdminRepo loginAdminRepo;
 
 	@Autowired
-	private LoginUserRepo loginUserRepo ;
+	private LoginUserRepo loginUserRepo;
+
+	private static boolean isAdmin = false;
+
+	private static boolean saveAdmin = false;
 
 	@Override
 	public boolean checkLoginID(List<Map<String, Object>> dynaBean, boolean isAdmin) throws IllegalArgumentException {
@@ -79,10 +79,19 @@ public class LoginServiceImpl implements LoginService {
 	public boolean isAdmin() {
 		return isAdmin;
 	}
-	
-	@Override 
+
+	@Override
 	public void setAdmin(boolean isAdmin) {
-		this.isAdmin = isAdmin;
+		LoginServiceImpl.isAdmin = isAdmin;
 	}
 
+	@Override
+	public boolean isSaveAdmin() {
+		return saveAdmin;
+	}
+
+	@Override
+	public void setSaveAdmin(boolean saveAdmin) {
+		LoginServiceImpl.saveAdmin = saveAdmin;
+	}
 }
